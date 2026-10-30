@@ -26,6 +26,21 @@ def test_josa():
     assert j('모델링', '을를') == '모델링을' and j('분석', '을를') == '분석을' and j('A+', '으로') == 'A+로'
 
 
+def test_track_of_two_digit_ids():
+    assert M.track_of('J101') == 'T1' and M.track_of('J510') == 'T5'
+    assert M.track_of('J1104') == 'T11' and M.track_of('J1208') == 'T12'
+    assert {t['track_id'] for t in M.tracks} >= {'T1', 'T6', 'T12'}
+    for k in M.kw:                                   # 모든 키워드가 실제 직렬로 연결돼야 함
+        assert M.track_of(k) in {t['track_id'] for t in M.tracks}
+
+
+def test_new_track_match():
+    cid = M.search_courses('영상디자인')[0]['course_id']
+    r = M.match({'courses': [cid], 'interests': [], 'tracks': ['T11'], 'certs': [], 'edu': 5, 'regions': []})
+    top = r['results'][0]
+    assert top['score'] >= 50 and '영상' in ' '.join(m['kw'] for m in top['match'])
+
+
 def test_course_search_hides_blocked():
     names = [c['과목명'] for c in M.search_courses('미래설계')]
     assert '미래설계준비' not in names

@@ -51,5 +51,7 @@ LLM 결과는 그대로 쓰지 않고 검사합니다. ① `[직접 입력]` 표
 
 ## 폴더
 - `app.py` Flask API · `matcher.py` 매칭 · `draft.py` 지원서·Word · `static/index.html` 화면
-- `data/cbnu.sqlite` 교과목 3,881개, 직무 키워드 48개, 고용24 공고 382건(2026-10-28 스냅샷)
+- `data/cbnu.sqlite` 교과목 3,881개, 직렬 12개·직무 키워드 112개, 고용24 공고 656건(2026-10-28·30 수집)
+- 2차 확장(10/30): 이차전지·에너지·화학, 바이오·제약·식품, 기계·자동차·로봇, 건설·환경·안전, 공공·행정·교육·복지, 디자인·미디어·콘텐츠, 금융·보험 추가.
+  과목·공고 매핑은 `pipeline/map_llm.py`(LLM 초안) → `merge_course_map.py`/`merge_posting_map.py` → `map/m05.txt`, `postmap/p04.txt` (검수 대상)
 - `pipeline/` 데이터 생성 스크립트와 매핑 원본(`map/` 과목→키워드, `postmap/` 공고→키워드)

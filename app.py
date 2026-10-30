@@ -59,7 +59,8 @@ def options():
     regions = sorted({p['시도'] for p in M.posts.values() if p.get('시도')})
     return jsonify({'tracks': tracks, 'certs': M.cert_options(), 'regions': regions,
                     'edu': [{'code': k, 'name': v} for k, v in EDU_NAME.items() if k >= 3],
-                    'snapshot': {'postings': len(M.posts), 'courses': sum(1 for c in M.courses.values() if c['선택가능'])}})
+                    'snapshot': {'postings': len(M.posts), 'courses': sum(1 for c in M.courses.values() if c['선택가능']),
+                                 'date': max((p.get('수집시각') or '')[:10] for p in M.posts.values())}})
 
 
 @app.get('/api/courses')

@@ -6,6 +6,11 @@ import pandas as pd
 
 S = sys.argv[1]
 P = json.load(open(S + '/w24/postings.json'))
+try:                                                     # 2차 확장 수집분 (신규 직렬 T6~T12)
+    _ids = {p['id'] for p in P}
+    P += [p for p in json.load(open(S + '/w24b/postings.json')) if p['id'] not in _ids]
+except FileNotFoundError:
+    pass
 
 SIDO = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '경기', '강원', '충청북도', '충청남도', '전라북도',
         '전북', '전라남도', '경상북도', '경상남도', '제주', '충북', '충남', '전남', '경북', '경남']

@@ -184,9 +184,12 @@ def render(out):
     return {sec: ' '.join(it['s'].strip() for it in items) for sec, items in out.items()}
 
 
-def call(messages, cfg, timeout=40):
-    body = {'model': cfg['model'], 'temperature': 0.2, 'messages': messages,
-            'response_format': {'type': 'json_object'}}
+def call(messages, cfg, timeout=40, max_tokens=None, json_mode=True):
+    body = {'model': cfg['model'], 'temperature': 0.2, 'messages': messages}
+    if json_mode:
+        body['response_format'] = {'type': 'json_object'}
+    if max_tokens:
+        body['max_tokens'] = max_tokens
     if 'gpt-oss' in cfg['model']:
         body['reasoning_effort'] = 'low'          # 추론 토큰 절약 (Groq 무료 한도: 분당 8,000토큰)
     req = urllib.request.Request(cfg['base'] + '/chat/completions', data=json.dumps(body).encode(),

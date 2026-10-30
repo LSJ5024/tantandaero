@@ -65,7 +65,7 @@ class Matcher:
 
     # ---------- 보조 ----------
     def track_of(self, kw_id):
-        return 'T' + kw_id[1]
+        return 'T' + kw_id[1:-2]          # J101 → T1, J1104 → T11 (뒤 두 자리는 직렬 내 순번)
 
     def search_courses(self, q, limit=20):
         qn = norm(q)

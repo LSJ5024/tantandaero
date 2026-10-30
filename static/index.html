@@ -49,7 +49,9 @@ h3{font-size:15px;margin:0 0 8px}
 .chip.on{background:var(--brand);border-color:var(--brand);color:#fff}
 .chip.static{cursor:default}
 .chip .x{margin-left:6px;opacity:.7}
-.tracks{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.tracks{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.tg{font-size:12.5px;font-weight:700;color:var(--brand);margin:12px 0 6px}
+.tg:first-child{margin-top:0}
 .track{border:1.5px solid var(--line);border-radius:10px;padding:12px;background:#fff;cursor:pointer;text-align:left;font:inherit}
 .track b{display:block;font-size:14.5px}
 .track small{color:var(--sub)}
@@ -129,7 +131,7 @@ a.btn{text-decoration:none;display:inline-block}
   <div class="card">
     <h2>관심 직렬</h2>
     <p class="hint">최대 2개까지 고를 수 있어요. 고른 직렬의 직무 키워드가 아래에 나타납니다.</p>
-    <div class="tracks" id="tracks"></div>
+    <div id="tracks"></div>
     <div id="kwbox" style="margin-top:14px"></div>
   </div>
   <div class="card">
@@ -219,7 +221,7 @@ $('nav').onclick = e => { const b=e.target.closest('button'); if(b) go(+b.datase
 async function init(){
   load();
   OPT = await (await fetch('/api/options')).json();
-  $('meta').textContent = `충북대 과목 ${OPT.snapshot.courses.toLocaleString()}개 · 고용24 공고 ${OPT.snapshot.postings}건 (2026-10-28 스냅샷)`;
+  $('meta').textContent = `충북대 과목 ${OPT.snapshot.courses.toLocaleString()}개 · 고용24 공고 ${OPT.snapshot.postings}건 (${OPT.snapshot.date} 기준)`;
   $('edu').innerHTML = OPT.edu.map(e=>`<option value="${e.code}">${e.name}</option>`).join('');
   $('edu').value = S.edu; $('edu').onchange = e => { S.edu=+e.target.value; save(); };
   $('certList').innerHTML = OPT.certs.map(c=>`<option value="${esc(c)}">`).join('');
@@ -227,7 +229,9 @@ async function init(){
 }
 
 function renderTracks(){
-  $('tracks').innerHTML = OPT.tracks.map(t=>`<button class="track ${S.tracks.includes(t.track_id)?'on':''}" data-t="${t.track_id}"><b>${esc(t.직렬)}</b><small>${esc(t.트랙)} · 키워드 ${t.keywords.length}개</small></button>`).join('');
+  const card = t=>`<button class="track ${S.tracks.includes(t.track_id)?'on':''}" data-t="${t.track_id}"><b>${esc(t.직렬)}</b><small>직무 ${t.keywords.length}개</small></button>`;
+  const groups = [...new Set(OPT.tracks.map(t=>t.트랙))];      // 계열별로 묶어서 표시
+  $('tracks').innerHTML = groups.map(g=>`<div class="tg">${esc(g)}</div><div class="tracks">${OPT.tracks.filter(t=>t.트랙==g).map(card).join('')}</div>`).join('');
   $('tracks').onclick = e => {
     const b=e.target.closest('.track'); if(!b) return; const id=b.dataset.t;
     if(S.tracks.includes(id)) { S.tracks=S.tracks.filter(x=>x!=id); const kws=OPT.tracks.find(t=>t.track_id==id).keywords.map(k=>k.kw_id); S.interests=S.interests.filter(k=>!kws.includes(k)); }
