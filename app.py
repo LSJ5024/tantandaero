@@ -117,7 +117,7 @@ def draft():
 def docx():
     b = request.get_json(force=True)
     buf = to_docx(b.get('title', '지원서 초안'), b.get('sections', {}))
-    return send_file(buf, as_attachment=True, download_name='tantandaero_draft.docx',
+    return send_file(buf, as_attachment=True, download_name='탄탄대로_지원서_초안.docx',
                      mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
 
 

@@ -35,6 +35,8 @@ nav button{flex:0 0 auto;background:transparent;border:0;color:#f6dbe5;padding:1
 nav button.on{background:var(--bg);color:var(--brand)}
 nav button .n{display:inline-block;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.2);text-align:center;font-size:12px;line-height:20px;margin-right:6px}
 nav button.on .n{background:var(--brand);color:#fff}
+@media (max-width:560px){nav{gap:2px}nav button{flex:1 1 0;padding:9px 4px;font-size:13px;letter-spacing:-.3px;white-space:nowrap}
+nav button .n{width:17px;height:17px;line-height:17px;font-size:11px;margin-right:3px}}
 main{padding:20px 16px 80px}
 section{display:none}
 section.on{display:block}
@@ -374,12 +376,15 @@ async function makeDraft(){
   $('orig').href = d.post.url;
   $('secs').innerHTML = Object.entries(d.sections).map(([h,t])=>{ const n=(t.match(/\[직접 입력/g)||[]).length;
     return `<div class="sec" style="margin-bottom:14px"><h3>${esc(h)} ${n?`<span class="ph">직접 입력 ${n}곳</span>`:''}</h3><textarea data-h="${esc(h)}">${esc(t)}</textarea></div>`; }).join('');
-  $('out').hidden=false; $('out').scrollIntoView({behavior:'smooth'});
+  $('out').hidden=false;
+  const fit=t=>{t.style.height='auto'; t.style.height=(t.scrollHeight+2)+'px';};   // 내용 길이에 맞춰 높이 자동 조절 (모바일에서 내부 스크롤 방지)
+  document.querySelectorAll('#secs textarea').forEach(t=>{fit(t); t.oninput=()=>fit(t);});
+  $('out').scrollIntoView({behavior:'smooth'});
 }
 async function downloadDocx(){
   const secs={}; document.querySelectorAll('#secs textarea').forEach(t=>secs[t.dataset.h]=t.value);
   const res = await fetch('/api/docx',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:S.title, sections:secs})});
-  const blob=await res.blob(); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="탄탄대로_지원서_초안.docx"; a.click();
+  const blob=await res.blob(); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="탄탄대로_지원서_초안.docx"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),10000);
 }
 init();
 </script>
