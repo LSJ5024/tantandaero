@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>탄탄대로 – 충북대 과목 기반 채용 매칭</title>
+<link rel="icon" type="image/svg+xml" href="/static/logo.svg">
+<link rel="apple-touch-icon" href="/static/logo.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -16,7 +18,13 @@
 body{margin:0;background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',system-ui,sans-serif;font-size:15px;line-height:1.55}
 header{background:var(--brand);color:#fff;padding:18px 16px 0}
 .wrap{max-width:1040px;margin:0 auto}
-header h1{margin:0;font-size:19px;font-weight:700}
+header h1{margin:0;font-size:19px;font-weight:700;display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px}
+.home{display:inline-flex;align-items:center;gap:10px;color:#fff;text-decoration:none}
+.home img{width:36px;height:36px;border-radius:9px;box-shadow:0 0 0 1px rgba(255,255,255,.35)}
+.home .name{font-size:21px;font-weight:700;letter-spacing:-.3px}
+.home:hover .name{text-decoration:underline;text-underline-offset:4px}
+.tagline{font-size:13px;font-weight:400;opacity:.85}
+@media (max-width:560px){.tagline{flex-basis:100%;margin-top:4px}}
 header p{margin:2px 0 12px;font-size:13px;opacity:.85}
 nav{display:flex;gap:4px;overflow-x:auto}
 nav button{flex:0 0 auto;background:transparent;border:0;color:#f6dbe5;padding:10px 14px;font:inherit;font-weight:500;border-radius:10px 10px 0 0;cursor:pointer}
@@ -97,7 +105,7 @@ a.btn{text-decoration:none;display:inline-block}
 <body>
 <header>
   <div class="wrap">
-    <h1>탄탄대로 <span style="font-size:13px;font-weight:400;opacity:.85">학(學)에서 업(業)으로 · 충북대 과목 기반 채용 매칭</span></h1>
+    <h1><a class="home" href="/" onclick="go(1);return false;" title="처음 화면으로"><img src="/static/logo.svg" alt=""><span class="name">탄탄대로</span></a><span class="tagline">학(學)에서 업(業)으로 · 충북대 과목 기반 채용 매칭</span></h1>
     <p id="meta">내가 들은 과목으로 전국 채용공고를 찾고, 그 과목을 근거로 지원서를 씁니다.</p>
     <nav id="nav">
       <button data-s="1" class="on"><span class="n">1</span>내 정보</button>

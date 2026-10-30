@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="탄탄대로">
+  <!-- 바탕: 둥근 사각형 배지 -->
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="#ffffff"/>
+  <!-- 지평선 위로 떠오르는 해 (목표) -->
+  <circle cx="32" cy="22" r="7" fill="#e8b84a"/>
+  <!-- 길: 아래에서 넓게 시작해 지평선으로 이어지는 큰길 -->
+  <path d="M10 56 L28 26 L36 26 L54 56 Z" fill="#aa325a"/>
+  <!-- 지평선 -->
+  <rect x="8" y="25" width="48" height="2.4" rx="1.2" fill="#8c2449"/>
+  <!-- 중앙 차선 (점선) -->
+  <rect x="31" y="31" width="2" height="4" rx="1" fill="#ffffff"/>
+  <rect x="30.6" y="38.5" width="2.8" height="5.5" rx="1.2" fill="#ffffff"/>
+  <rect x="30.2" y="47.5" width="3.6" height="7" rx="1.5" fill="#ffffff"/>
+</svg>
