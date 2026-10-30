@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>탄탄대로 – 충북대 과목 기반 채용 매칭</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f7f9; --card:#fff; --ink:#1b1f24; --sub:#5b6470; --line:#e3e6ea;
+  --brand:#1f4e8c; --brand-soft:#e8eff8; --ok:#1d7a4f; --ok-soft:#e5f4ec; --warn:#a15c07; --warn-soft:#fdf1e1;
+  --no:#a3312b; --no-soft:#fbeaea; --chip:#eef1f4;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',system-ui,sans-serif;font-size:15px;line-height:1.55}
+header{background:var(--brand);color:#fff;padding:18px 16px 0}
+.wrap{max-width:1040px;margin:0 auto}
+header h1{margin:0;font-size:19px;font-weight:700}
+header p{margin:2px 0 12px;font-size:13px;opacity:.85}
+nav{display:flex;gap:4px;overflow-x:auto}
+nav button{flex:0 0 auto;background:transparent;border:0;color:#cfe0f5;padding:10px 14px;font:inherit;font-weight:500;border-radius:10px 10px 0 0;cursor:pointer}
+nav button.on{background:var(--bg);color:var(--brand)}
+nav button .n{display:inline-block;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.2);text-align:center;font-size:12px;line-height:20px;margin-right:6px}
+nav button.on .n{background:var(--brand);color:#fff}
+main{padding:20px 16px 80px}
+section{display:none}
+section.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:14px}
+h2{font-size:17px;margin:0 0 4px}
+h3{font-size:15px;margin:0 0 8px}
+.hint{color:var(--sub);font-size:13px;margin:0 0 12px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{border:1px solid var(--line);background:var(--chip);border-radius:999px;padding:6px 12px;font:inherit;font-size:13.5px;cursor:pointer;color:var(--ink)}
+.chip.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.chip.static{cursor:default}
+.chip .x{margin-left:6px;opacity:.7}
+.tracks{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.track{border:1.5px solid var(--line);border-radius:10px;padding:12px;background:#fff;cursor:pointer;text-align:left;font:inherit}
+.track b{display:block;font-size:14.5px}
+.track small{color:var(--sub)}
+.track.on{border-color:var(--brand);background:var(--brand-soft)}
+select,input[type=text],textarea{font:inherit;border:1px solid var(--line);border-radius:8px;padding:9px 11px;background:#fff;color:var(--ink);width:100%}
+textarea{min-height:110px;resize:vertical}
+label.f{display:block;font-size:13px;color:var(--sub);margin:10px 0 4px}
+.btn{background:var(--brand);color:#fff;border:0;border-radius:8px;padding:10px 16px;font:inherit;font-weight:500;cursor:pointer}
+.btn.ghost{background:#fff;color:var(--brand);border:1px solid var(--brand)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.bar{position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 30%);padding:16px 0 4px;display:flex;justify-content:flex-end;gap:8px}
+.list{border:1px solid var(--line);border-radius:10px;max-height:320px;overflow:auto;margin-top:8px;background:#fff}
+.item{display:flex;justify-content:space-between;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer}
+.item:last-child{border-bottom:0}
+.item:hover{background:var(--brand-soft)}
+.item small{color:var(--sub);display:block}
+.kw{font-size:12px;color:var(--brand)}
+.sel{display:grid;gap:6px;margin-top:10px}
+.sel .s{display:flex;justify-content:space-between;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:#fff}
+.count{font-weight:700;color:var(--brand)}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.controls select{width:auto}
+.res{display:grid;gap:10px}
+.post{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;grid-template-columns:64px 1fr;gap:14px}
+.score{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:20px;color:var(--brand);background:conic-gradient(var(--brand) calc(var(--p)*1%),var(--brand-soft) 0)}
+.score span{background:#fff;width:50px;height:50px;border-radius:50%;display:grid;place-items:center}
+.post .co{color:var(--sub);font-size:13px}
+.post .ti{font-weight:700;margin:1px 0 6px}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.tag{font-size:12px;padding:2px 8px;border-radius:6px;background:var(--chip);color:var(--sub)}
+.tag.cb{background:var(--ok-soft);color:var(--ok);font-weight:500}
+.tag.d{background:var(--warn-soft);color:var(--warn)}
+.tag.no{background:var(--no-soft);color:var(--no)}
+.why{font-size:13.5px;margin:2px 0}
+.why b{font-weight:500}
+.why.good b{color:var(--ok)}
+.why.gap b{color:var(--warn)}
+.parts{font-size:12px;color:var(--sub);margin-top:4px}
+.post .act{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.post .act a,.post .act button{font-size:13px;padding:7px 12px}
+a.btn{text-decoration:none;display:inline-block}
+.summary{display:flex;flex-wrap:wrap;gap:6px}
+.empty{color:var(--sub);text-align:center;padding:30px}
+.reason{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;background:#fff}
+.reason .grid{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.sec h3{display:flex;justify-content:space-between}
+.ph{color:var(--warn);font-size:12px;font-weight:500}
+.note{font-size:12.5px;color:var(--sub)}
+.badge{display:inline-block;font-size:11px;padding:1px 7px;border-radius:999px;background:var(--brand-soft);color:var(--brand);margin-left:6px;vertical-align:middle}
+@media (max-width:560px){
+  .post{grid-template-columns:1fr}
+  .score{width:54px;height:54px;font-size:17px}
+  .score span{width:42px;height:42px}
+  .reason .grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>탄탄대로 <span style="font-size:13px;font-weight:400;opacity:.85">학(學)에서 업(業)으로 · 충북대 과목 기반 채용 매칭</span></h1>
+    <p id="meta">내가 들은 과목으로 전국 채용공고를 찾고, 그 과목을 근거로 지원서를 씁니다.</p>
+    <nav id="nav">
+      <button data-s="1" class="on"><span class="n">1</span>내 정보</button>
+      <button data-s="2"><span class="n">2</span>대표 과목</button>
+      <button data-s="3"><span class="n">3</span>공고 매칭</button>
+      <button data-s="4"><span class="n">4</span>지원서</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+<!-- 1 내 정보 -->
+<section id="s1" class="on">
+  <div class="card">
+    <h2>관심 직렬</h2>
+    <p class="hint">최대 2개까지 고를 수 있어요. 고른 직렬의 직무 키워드가 아래에 나타납니다.</p>
+    <div class="tracks" id="tracks"></div>
+    <div id="kwbox" style="margin-top:14px"></div>
+  </div>
+  <div class="card">
+    <h2>학력 · 자격증 · 희망 지역</h2>
+    <label class="f">최종 학력 (졸업 예정 포함)</label>
+    <select id="edu"></select>
+    <label class="f">자격증·어학 (입력 후 Enter)</label>
+    <input type="text" id="certIn" list="certList" placeholder="예: ADsP, 전산회계1급, TOEIC">
+    <datalist id="certList"></datalist>
+    <div class="row" id="certs" style="margin-top:8px"></div>
+    <label class="f">희망 근무 지역 (선택하지 않으면 전국)</label>
+    <div class="row" id="regions"></div>
+  </div>
+  <div class="bar"><button class="btn" onclick="go(2)">다음: 대표 과목 고르기</button></div>
+</section>
+
+<!-- 2 대표 과목 -->
+<section id="s2">
+  <div class="card">
+    <h2>대표 과목 <span class="count" id="ccount">0</span>/10</h2>
+    <p class="hint">성적이 특히 좋았거나 프로젝트·과제 결과물이 있는 과목을 최대 10개 고르세요. 고른 이유는 지원서를 쓸 때 입력합니다.</p>
+    <input type="text" id="cq" placeholder="과목명 검색 (예: 데이터마이닝, 반도체공정, 회계원리)" autocomplete="off">
+    <div class="list" id="clist" hidden></div>
+    <div class="sel" id="csel"></div>
+  </div>
+  <div class="bar"><button class="btn ghost" onclick="go(1)">이전</button><button class="btn" onclick="go(3)">매칭 결과 보기</button></div>
+</section>
+
+<!-- 3 매칭 -->
+<section id="s3">
+  <div class="card">
+    <div class="controls">
+      <select id="sort"><option value="score">적합도순</option><option value="deadline">마감 임박순</option><option value="salary">연봉순</option></select>
+      <label><input type="checkbox" id="cb"> 충북 공고 먼저</label>
+      <label><input type="checkbox" id="inel"> 지원 불가 공고도 보기</label>
+    </div>
+    <div id="mysum" style="margin-top:12px"></div>
+  </div>
+  <div class="res" id="res"><div class="empty">내 정보와 과목을 고른 뒤 결과가 나타납니다.</div></div>
+</section>
+
+<!-- 4 지원서 -->
+<section id="s4">
+  <div id="d0" class="card empty">매칭 결과에서 ‘지원서 쓰기’를 누르면 시작합니다.</div>
+  <div id="d1" hidden>
+    <div class="card" id="dpost"></div>
+    <div class="card">
+      <h2>이 공고에 쓸 과목과 고른 이유</h2>
+      <p class="hint">공고와 겹치는 과목을 먼저 골라 두었어요(최대 3개). 과목마다 수업에서 다룬 주제가 미리 채워져 있어요. 실제로 배운 주제만 남기고, 성적이나 성과물이 있으면 체크해서 아는 칸만 채우세요. 비워 둔 칸은 초안에서 빠집니다.</p>
+      <div id="reasons"></div>
+      <div class="row" style="justify-content:flex-end;margin-top:6px"><button class="btn" onclick="makeDraft()">초안 만들기</button></div>
+    </div>
+    <div id="out" hidden>
+      <div class="card">
+        <h2>지원서 초안 <span id="llm" class="badge"></span></h2>
+        <p class="hint">화면에서 고친 내용이 그대로 Word 파일로 저장됩니다.</p>
+        <p class="note" id="llmwhy"></p>
+        <div id="secs"></div>
+        <div class="row"><button class="btn" onclick="downloadDocx()">Word로 저장</button><a class="btn ghost" id="orig" target="_blank" rel="noopener">고용24 원문 공고 (직접 지원)</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<script>
+const S = {tracks:[], interests:[], certs:[], edu:5, regions:[], courses:[], cmeta:{}, reasons:{}, sel:null, sections:null, picked:[]};
+let OPT = null;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function save(){ try{ localStorage.setItem('cbnuJobs', JSON.stringify({tracks:S.tracks,interests:S.interests,certs:S.certs,edu:S.edu,regions:S.regions,courses:S.courses,cmeta:S.cmeta,reasons:S.reasons})); }catch(e){} }
+function load(){ try{ Object.assign(S, JSON.parse(localStorage.getItem('cbnuJobs')||'{}')); }catch(e){} }
+
+function go(n){
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on', b.dataset.s==n));
+  document.querySelectorAll('section').forEach(s=>s.classList.toggle('on', s.id=='s'+n));
+  window.scrollTo(0,0);
+  if(n==3) runMatch();
+}
+$('nav').onclick = e => { const b=e.target.closest('button'); if(b) go(+b.dataset.s); };
+
+async function init(){
+  load();
+  OPT = await (await fetch('/api/options')).json();
+  $('meta').textContent = `충북대 과목 ${OPT.snapshot.courses.toLocaleString()}개 · 고용24 공고 ${OPT.snapshot.postings}건 (2026-10-28 스냅샷)`;
+  $('edu').innerHTML = OPT.edu.map(e=>`<option value="${e.code}">${e.name}</option>`).join('');
+  $('edu').value = S.edu; $('edu').onchange = e => { S.edu=+e.target.value; save(); };
+  $('certList').innerHTML = OPT.certs.map(c=>`<option value="${esc(c)}">`).join('');
+  renderTracks(); renderCerts(); renderRegions(); renderSel();
+}
+
+function renderTracks(){
+  $('tracks').innerHTML = OPT.tracks.map(t=>`<button class="track ${S.tracks.includes(t.track_id)?'on':''}" data-t="${t.track_id}"><b>${esc(t.직렬)}</b><small>${esc(t.트랙)} · 키워드 ${t.keywords.length}개</small></button>`).join('');
+  $('tracks').onclick = e => {
+    const b=e.target.closest('.track'); if(!b) return; const id=b.dataset.t;
+    if(S.tracks.includes(id)) { S.tracks=S.tracks.filter(x=>x!=id); const kws=OPT.tracks.find(t=>t.track_id==id).keywords.map(k=>k.kw_id); S.interests=S.interests.filter(k=>!kws.includes(k)); }
+    else { if(S.tracks.length>=2) S.tracks.shift(); S.tracks.push(id); }
+    save(); renderTracks();
+  };
+  $('kwbox').innerHTML = S.tracks.map(id=>{
+    const t=OPT.tracks.find(x=>x.track_id==id);
+    return `<h3>${esc(t.직렬)} – 관심 직무</h3><div class="row" style="margin-bottom:12px">${t.keywords.map(k=>`<button class="chip ${S.interests.includes(k.kw_id)?'on':''}" data-k="${k.kw_id}" title="${esc(k.설명)} · ${esc(k.자격증)}">${esc(k.키워드)}</button>`).join('')}</div>`;
+  }).join('') || '<p class="hint">직렬을 고르면 직무 키워드가 나타납니다.</p>';
+  $('kwbox').onclick = e => { const b=e.target.closest('.chip'); if(!b) return; const k=b.dataset.k;
+    S.interests = S.interests.includes(k) ? S.interests.filter(x=>x!=k) : [...S.interests,k]; save(); b.classList.toggle('on'); };
+}
+function renderCerts(){
+  $('certs').innerHTML = S.certs.map((c,i)=>`<span class="chip static">${esc(c)}<a class="x" href="#" data-i="${i}">✕</a></span>`).join('');
+  $('certs').onclick = e => { const a=e.target.closest('a'); if(!a) return; e.preventDefault(); S.certs.splice(+a.dataset.i,1); save(); renderCerts(); };
+}
+$('certIn').addEventListener('keydown', e => { if(e.key==='Enter' && e.target.value.trim()){ const v=e.target.value.trim(); if(!S.certs.includes(v)) S.certs.push(v); e.target.value=''; save(); renderCerts(); }});
+function renderRegions(){
+  $('regions').innerHTML = OPT.regions.map(r=>`<button class="chip ${S.regions.includes(r)?'on':''}" data-r="${esc(r)}">${esc(r)}</button>`).join('');
+  $('regions').onclick = e => { const b=e.target.closest('.chip'); if(!b) return; const r=b.dataset.r; S.regions = S.regions.includes(r)?S.regions.filter(x=>x!=r):[...S.regions,r]; save(); b.classList.toggle('on'); };
+}
+
+// 과목 검색
+let tmr;
+$('cq').addEventListener('input', e => { clearTimeout(tmr); tmr=setTimeout(()=>searchC(e.target.value), 180); });
+async function searchC(q){
+  if(!q.trim()){ $('clist').hidden=true; return; }
+  const rows = await (await fetch('/api/courses?q='+encodeURIComponent(q))).json();
+  $('clist').hidden=false;
+  $('clist').innerHTML = rows.length ? rows.map(r=>`<div class="item" data-id="${r.course_id}" data-n="${esc(r.과목명)}" data-d="${esc(r.학과)}" data-k="${esc(r.직무키워드)}"><div>${esc(r.과목명)}<small>${esc(r.학과)}</small></div><div class="kw">${esc((r.직무키워드||'').split(',')[0].replace(/^J\d+ /,''))}</div></div>`).join('') : '<div class="empty">검색 결과가 없어요</div>';
+}
+$('clist').onclick = e => { const it=e.target.closest('.item'); if(!it) return;
+  if(S.courses.length>=10) { alertMsg('대표 과목은 최대 10개입니다'); return; }
+  if(!S.courses.includes(it.dataset.id)){ S.courses.push(it.dataset.id); S.cmeta[it.dataset.id]={n:it.dataset.n,d:it.dataset.d,k:it.dataset.k}; }
+  $('cq').value=''; $('clist').hidden=true; save(); renderSel(); };
+function renderSel(){
+  $('ccount').textContent = S.courses.length;
+  $('csel').innerHTML = S.courses.map(id=>{ const m=S.cmeta[id]||{n:id}; return `<div class="s"><div><b>${esc(m.n)}</b> <small class="kw">${esc((m.k||'직무 키워드 없음').replace(/J\d+ /g,''))}</small><br><small class="note">${esc(m.d||'')}</small></div><button class="chip" data-id="${id}">빼기</button></div>`; }).join('');
+  $('csel').onclick = e => { const b=e.target.closest('button'); if(!b) return; S.courses=S.courses.filter(x=>x!=b.dataset.id); save(); renderSel(); };
+}
+function alertMsg(m){ const d=document.createElement('div'); d.textContent=m; d.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1b1f24;color:#fff;padding:10px 16px;border-radius:8px;z-index:9'; document.body.appendChild(d); setTimeout(()=>d.remove(),1800); }
+
+// 매칭
+['sort','cb','inel'].forEach(id=>$(id).addEventListener('change', runMatch));
+let LAST=null;
+async function runMatch(){
+  if(!S.courses.length && !S.interests.length){ $('res').innerHTML='<div class="empty">관심 직무나 대표 과목을 1개 이상 골라 주세요.</div>'; $('mysum').innerHTML=''; return; }
+  $('res').innerHTML='<div class="empty">공고를 비교하는 중…</div>';
+  const body={...prof(), sort:$('sort').value, cb_first:$('cb').checked, include_ineligible:$('inel').checked};
+  LAST = await (await fetch('/api/match',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})).json();
+  $('mysum').innerHTML = `<div class="note" style="margin-bottom:6px">내 과목·관심 직무에서 나온 키워드 (지원 가능 ${LAST.count}건 · 지원 불가 ${LAST.ineligible_count}건)</div>
+    <div class="summary">${LAST.my_keywords.map(k=>`<span class="chip static">${esc(k.kw.replace(/^J\d+ /,''))} ${'●'.repeat(Math.min(4,k.strength))}</span>`).join('')}</div>
+    ${LAST.cert_gap.length?`<div class="note" style="margin-top:10px">상위 공고에서 자주 요구·우대하는 자격증: ${LAST.cert_gap.map(c=>`<b>${esc(c.cert)}</b>(${c.posts}건)`).join(', ')}</div>`:''}`;
+  const rows=[...LAST.results, ...(LAST.ineligible||[])];
+  $('res').innerHTML = rows.length ? rows.map(card).join('') : '<div class="empty">조건에 맞는 공고가 없어요. 희망 지역을 넓혀 보세요.</div>';
+}
+function prof(){ return {tracks:S.tracks, interests:S.interests, certs:S.certs, edu:S.edu, regions:S.regions, courses:S.courses}; }
+function card(r){
+  const tags=[ r.충북?'<span class="tag cb">충북</span>':'', r.시도?`<span class="tag">${esc(r.시도)} ${esc(r.시군구||'')}</span>`:'',
+    r.학력?`<span class="tag">${esc(r.학력)}</span>`:'', r.경력?`<span class="tag">${esc(r.경력.split(' ')[0])}</span>`:'',
+    r.연봉?`<span class="tag">연 ${r.연봉.toLocaleString()}만원~</span>`:'',
+    r.dday!=null?`<span class="tag d">D-${r.dday}</span>`:'<span class="tag">채용시까지</span>',
+    r.기업형태?`<span class="tag">${esc(r.기업형태)}</span>`:'',
+    ...(r.license||[]).map(l=>`<span class="tag">${esc(l)} 필요</span>`),
+    ...(r.reasons_no||[]).map(x=>`<span class="tag no">지원 불가: ${esc(x)}</span>`)].join('');
+  const good = r.match.map(m=>`${esc(m.kw.replace(/^J\d+ /,''))}${m.과목.length?' ← '+m.과목.map(esc).join(', '):''}${m.관심&&!m.과목.length?' ← 관심 직무':''}`).join(' · ');
+  return `<div class="post"><div class="score" style="--p:${r.score}"><span>${r.score}</span></div><div>
+    <div class="co">${esc(r.company)}</div><div class="ti">${esc(r.title)}</div><div class="tags">${tags}</div>
+    ${good?`<div class="why good"><b>맞는 점</b> ${good}</div>`:''}
+    ${r.gap.length?`<div class="why gap"><b>부족한 점</b> ${r.gap.map(g=>esc(g.replace(/^J\d+ /,''))).join(', ')}</div>`:''}
+    ${r.cert_hit.length?`<div class="why good"><b>자격</b> ${r.cert_hit.map(esc).join(', ')} 보유</div>`:''}
+    <div class="parts">직무 ${r.parts.직무}/55 · 직렬 ${r.parts.직렬}/10 · 자격 ${r.parts.자격}/15 · 학력 ${r.parts.학력}/10 · 지역 ${r.parts.지역}/10</div>
+    <div class="act"><a class="btn ghost" href="${esc(r.url)}" target="_blank" rel="noopener">원문 공고</a>${r.eligible?`<button class="btn" onclick="startDraft('${r.posting_id}')">지원서 쓰기</button>`:''}</div>
+  </div></div>`;
+}
+
+// 지원서
+async function startDraft(pid){
+  S.sel = pid;
+  const r=[...LAST.results].find(x=>x.posting_id==pid);
+  const hit=new Set(r.match.flatMap(m=>m.과목));
+  S.picked = S.courses.filter(c=>hit.has((S.cmeta[c]||{}).n)).slice(0,3);
+  if(!S.picked.length) S.picked=S.courses.slice(0,2);
+  $('d0').hidden=true; $('d1').hidden=false; $('out').hidden=true;
+  $('dpost').innerHTML = `<div class="co note">${esc(r.company)}</div><h2>${esc(r.title)}</h2><div class="tags" style="margin-top:6px">${(r.직무키워드||'').split(', ').map(k=>`<span class="tag">${esc(k.replace(/^J\d+ /,''))}</span>`).join('')}</div>`;
+  $('reasons').innerHTML='<div class="empty">과목별 학습 주제를 불러오는 중…</div>'; go(4);
+  try{ S.syl = await (await fetch('/api/syllabus?ids='+S.courses.join(','))).json(); }catch(e){ S.syl={}; }
+  S.courses.forEach(id=>{ const sy=(S.syl||{})[id]; const r=S.reasons[id]||(S.reasons[id]={reasons:[]}); if(sy && !r.topics) r.topics=[...sy.주제]; });
+  save(); renderReasons();
+}
+function topicBox(id, r){
+  const sy=(S.syl||{})[id]; if(!sy) return '';
+  const est=(sy.출처||'').startsWith('추정');
+  return `<div style="margin-bottom:10px"><div class="note">수업에서 다룬 주제 <span class="badge">${est?'강의명 기반 추정':'강의계획서'}</span> · 배우지 않은 주제는 눌러서 빼세요</div>
+    <div class="row" style="margin-top:6px">${sy.주제.map(t=>`<button type="button" class="chip tp ${ (r.topics||[]).includes(t)?'on':''}" data-t="${esc(t)}">${esc(t)}</button>`).join('')}</div></div>`;
+}
+$('reasons').addEventListener('click', e=>{
+  const b=e.target.closest('.tp'); if(!b) return;
+  const id=b.closest('.reason').dataset.id; const r=S.reasons[id]||(S.reasons[id]={reasons:[]}); const t=b.dataset.t;
+  r.topics = (r.topics||[]).includes(t) ? r.topics.filter(x=>x!=t) : [...(r.topics||[]), t];
+  b.classList.toggle('on'); save();
+});
+function renderReasons(){
+  $('reasons').innerHTML = S.courses.map(id=>{
+    const m=S.cmeta[id]||{n:id}; const on=S.picked.includes(id); const r=S.reasons[id]||{reasons:[]}; const has=x=>r.reasons.includes(x);
+    return `<div class="reason" data-id="${id}">
+      <label><input type="checkbox" class="pk" ${on?'checked':''}> <b>${esc(m.n)}</b> <small class="kw">${esc((m.k||'').replace(/J\d+ /g,''))}</small></label>
+      <div ${on?'':'hidden'} class="body" style="margin-top:8px">
+        ${topicBox(id, r)}
+        <div class="row"><label><input type="checkbox" class="rs" value="grade" ${has('grade')?'checked':''}> 높은 성적</label>
+        <label><input type="checkbox" class="rs" value="output" ${has('output')?'checked':''}> 프로젝트·과제 성과물</label>
+        <label><input type="checkbox" class="rs" value="knowledge" ${has('knowledge')?'checked':''}> 직무 관련 지식</label></div>
+        <div class="grid">
+          <div data-for="grade" ${has('grade')?'':'hidden'}><label class="f">성적</label><input type="text" data-f="grade" value="${esc(r.grade||'')}" placeholder="예: A+"></div>
+          <div data-for="output" ${has('output')?'':'hidden'}><label class="f">성과물 제목</label><input type="text" data-f="title" value="${esc(r.title||'')}" placeholder="예: 고객 이탈 예측 모델"></div>
+          <div data-for="output" ${has('output')?'':'hidden'}><label class="f">맡은 역할</label><input type="text" data-f="role" value="${esc(r.role||'')}" placeholder="예: 데이터 전처리와 모델링"></div>
+          <div data-for="output" ${has('output')?'':'hidden'}><label class="f">사용 도구·기법</label><input type="text" data-f="tools" value="${esc(r.tools||'')}" placeholder="예: Python, 랜덤포레스트"></div>
+          <div data-for="output" ${has('output')?'':'hidden'}><label class="f">결과·수치 (없으면 비워 두세요)</label><input type="text" data-f="result" value="${esc(r.result||'')}" placeholder="예: 정확도 87%, 발표 1위"></div>
+          <div data-for="knowledge" ${has('knowledge')?'':'hidden'}><label class="f">배운 핵심 내용</label><input type="text" data-f="learned" value="${esc(r.learned||'')}" placeholder="예: 공급망 재고 정책과 수요예측"></div>
+        </div>
+      </div></div>`;
+  }).join('');
+}
+$('reasons').addEventListener('change', e=>{
+  const box=e.target.closest('.reason'); const id=box.dataset.id; const r=S.reasons[id]||(S.reasons[id]={reasons:[]});
+  if(e.target.classList.contains('pk')){
+    if(e.target.checked){ if(S.picked.length>=3){ e.target.checked=false; alertMsg('공고당 과목은 최대 3개'); return; } S.picked.push(id); } else S.picked=S.picked.filter(x=>x!=id);
+    box.querySelector('.body').hidden=!e.target.checked; return;
+  }
+  if(e.target.classList.contains('rs')){
+    r.reasons = [...box.querySelectorAll('.rs:checked')].map(x=>x.value);
+    box.querySelectorAll('[data-for]').forEach(d=>d.hidden=!r.reasons.includes(d.dataset.for));
+  }
+  save();
+});
+$('reasons').addEventListener('input', e=>{ const f=e.target.dataset.f; if(!f) return; const id=e.target.closest('.reason').dataset.id; (S.reasons[id]||(S.reasons[id]={reasons:[]}))[f]=e.target.value; save(); });
+
+async function makeDraft(){
+  const body={...prof(), posting_id:S.sel, picked:S.picked, reasons:S.reasons, extra:{}};
+  const d = await (await fetch('/api/draft',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})).json();
+  S.sections=d.sections; S.title=`${d.post.company} – ${d.post.title}`;
+  $('llm').textContent = d.llm.used ? `AI 다듬기 적용 · ${d.llm.model}` : '템플릿 초안';
+  $('llmwhy').textContent = d.llm.used ? '입력하지 않은 수치·도구가 추가되지 않았는지 자동 검사를 통과했습니다.' : (d.llm.reason||'');
+  S.template = d.template;
+  $('orig').href = d.post.url;
+  $('secs').innerHTML = Object.entries(d.sections).map(([h,t])=>{ const n=(t.match(/\[직접 입력/g)||[]).length;
+    return `<div class="sec" style="margin-bottom:14px"><h3>${esc(h)} ${n?`<span class="ph">직접 입력 ${n}곳</span>`:''}</h3><textarea data-h="${esc(h)}">${esc(t)}</textarea></div>`; }).join('');
+  $('out').hidden=false; $('out').scrollIntoView({behavior:'smooth'});
+}
+async function downloadDocx(){
+  const secs={}; document.querySelectorAll('#secs textarea').forEach(t=>secs[t.dataset.h]=t.value);
+  const res = await fetch('/api/docx',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:S.title, sections:secs})});
+  const blob=await res.blob(); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="탄탄대로_지원서_초안.docx"; a.click();
+}
+init();
+</script>
+</body>
+</html>
