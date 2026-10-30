@@ -17,6 +17,10 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',system-ui,sans-serif;font-size:15px;line-height:1.55}
 header{background:var(--brand);color:#fff;padding:18px 16px 0}
+header .wrap{position:relative}
+.reset{position:absolute;top:2px;right:0;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.55);border-radius:8px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
+.reset:hover{background:rgba(255,255,255,.15)}
+@media (max-width:560px){.reset{padding:5px 9px;font-size:12px}}
 .wrap{max-width:1040px;margin:0 auto}
 header h1{margin:0;font-size:19px;font-weight:700;display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px}
 .home{display:inline-flex;align-items:center;gap:10px;color:#fff;text-decoration:none}
@@ -105,6 +109,7 @@ a.btn{text-decoration:none;display:inline-block}
 <body>
 <header>
   <div class="wrap">
+    <button class="reset" type="button" onclick="resetAll()" title="입력한 정보를 모두 지우고 처음부터 시작">↺ 처음부터</button>
     <h1><a class="home" href="/" onclick="go(1);return false;" title="처음 화면으로"><img src="/static/logo.svg" alt=""><span class="name">탄탄대로</span></a><span class="tagline">학(學)에서 업(業)으로 · 충북대 과목 기반 채용 매칭</span></h1>
     <p id="meta">내가 들은 과목으로 전국 채용공고를 찾고, 그 과목을 근거로 지원서를 씁니다.</p>
     <nav id="nav">
@@ -194,6 +199,11 @@ let OPT = null;
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function save(){ try{ localStorage.setItem('cbnuJobs', JSON.stringify({tracks:S.tracks,interests:S.interests,certs:S.certs,edu:S.edu,regions:S.regions,courses:S.courses,cmeta:S.cmeta,reasons:S.reasons})); }catch(e){} }
+function resetAll(){
+  if(!confirm('입력한 정보(직렬·과목·자격증·지원서 작성 내용)를 모두 지우고 처음부터 시작할까요?')) return;
+  try{ localStorage.removeItem('cbnuJobs'); }catch(e){}
+  location.replace('/');
+}
 function load(){ try{ Object.assign(S, JSON.parse(localStorage.getItem('cbnuJobs')||'{}')); }catch(e){} }
 
 function go(n){
