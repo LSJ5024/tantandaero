@@ -28,6 +28,7 @@ def load_env(path=BASE / '.env'):
 load_env()
 app = Flask(__name__, static_folder=str(BASE / 'static'))
 app.json.sort_keys = False   # 지원서 항목 순서 유지
+app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024   # 시간표 이미지 업로드 상한
 M = Matcher(str(BASE / 'data' / 'cbnu.sqlite'))
 SYL = Syllabus(str(BASE / 'data' / 'cbnu.sqlite'), M.courses)
 
@@ -72,6 +73,28 @@ def courses():
 def syllabus():
     ids = [x for x in request.args.get('ids', '').split(',') if x][:10]
     return jsonify(SYL.get(ids))
+
+
+@app.post('/api/timetable')
+def timetable():
+    """시간표 캡처(최대 4장) → 과목명 추출 → DB 과목 후보. 이미지는 저장하지 않음."""
+    files = request.files.getlist('images')[:4]
+    if not files:
+        return jsonify({'error': '이미지를 올려 주세요'}), 400
+    names, errors = [], []
+    for f in files:
+        data = f.read()
+        if len(data) > 4 * 1024 * 1024:
+            errors.append(f'{f.filename}: 4MB 이하 이미지만 가능합니다'); continue
+        if not (f.mimetype or '').startswith('image/'):
+            errors.append(f'{f.filename}: 이미지 파일이 아닙니다'); continue
+        try:
+            for n in llm.extract_courses(data, f.mimetype):
+                if n not in names:
+                    names.append(n)
+        except Exception as e:                       # 키 없음·한도 초과 등
+            errors.append(f'{f.filename}: 읽기 실패 ({str(e)[:80]})')
+    return jsonify({'items': M.resolve_names(names), 'errors': errors})
 
 
 @app.post('/api/match')

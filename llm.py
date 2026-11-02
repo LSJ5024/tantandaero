@@ -259,3 +259,41 @@ def polish(draft, facts, max_tries=2):
                  {'role': 'user', 'content': f'규칙 위반: {reason}. 이 문제를 고쳐 같은 JSON 형식으로 전체를 다시 작성해.'}]
     info['reason'] = f'{reason} → 템플릿 초안 사용'
     return draft, info
+
+
+# ---------- 시간표 캡처 → 과목명 추출 (비전 모델) ----------
+VISION_PROMPT = """이 이미지는 대학교 수업 시간표(또는 수강 내역) 캡처다.
+이미지에 적힌 '과목명'만 그대로 뽑아라.
+규칙:
+- 강의실·건물 코드(예: N14-307), 시간, 요일, 교수명, 학점 숫자는 제외한다.
+- 칸 안에서 줄바꿈된 과목명은 하나로 이어 붙인다 (예: '프로젝트관' + '리' → '프로젝트관리').
+- 이미지에 없는 과목을 만들어내지 않는다. 읽기 어려운 글자는 추측하지 말고 그 과목을 빼라.
+- 같은 과목이 여러 칸에 있으면 한 번만 쓴다.
+출력: JSON 객체 하나. {"courses": ["과목명", ...]}"""
+
+
+def vision_config():
+    c = config()
+    c['model'] = os.environ.get('VISION_MODEL', 'qwen/qwen3.8-27b')   # 지원서용 모델과 한도가 분리됨
+    return c
+
+
+def extract_courses(image_bytes, mime='image/jpeg'):
+    """시간표 이미지 → 과목명 목록. 이미지는 저장하지 않고 요청에만 사용."""
+    import base64
+    cfg = vision_config()
+    if not (cfg['key'] and cfg['base']):
+        raise RuntimeError('LLM 키가 설정되지 않았습니다')
+    url = f"data:{mime};base64," + base64.b64encode(image_bytes).decode()
+    msgs = [{'role': 'user', 'content': [{'type': 'text', 'text': VISION_PROMPT},
+                                         {'type': 'image_url', 'image_url': {'url': url}}]}]
+    raw = call(msgs, cfg, timeout=60, json_mode=False)
+    m = re.search(r'\{.*\}|\[.*\]', raw, re.S)
+    data = json.loads(m.group(0)) if m else {}
+    names = data.get('courses', []) if isinstance(data, dict) else data
+    out = []
+    for n in names:
+        n = re.sub(r'\s+', ' ', str(n)).strip()
+        if 2 <= len(n) <= 40 and n not in out and not re.fullmatch(r'[A-Z]?\d+[-\d()]*', n):
+            out.append(n)
+    return out[:30]

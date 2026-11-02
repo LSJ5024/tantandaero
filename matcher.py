@@ -83,6 +83,37 @@ class Matcher:
         return [{'course_id': c['course_id'], '과목명': c['과목명'], '학과': (c['학과'] or '')[:40],
                  '직무키워드': c['직무키워드'] or ''} for c in out[:limit]]
 
+    def resolve_names(self, names):
+        """시간표에서 읽은 과목명 → DB 과목 후보 (띄어쓰기·괄호 무시 정확 일치 우선, 없으면 유사 후보 최대 3개)"""
+        from difflib import SequenceMatcher
+        pool = [c for c in self.courses.values() if c['선택가능']]
+        def row(c):
+            return {'course_id': c['course_id'], '과목명': c['과목명'], '학과': (c['학과'] or '')[:40],
+                    '직무키워드': c['직무키워드'] or ''}
+        out = []
+        for name in names:
+            n = norm(name)
+            if len(n) < 2:
+                continue
+            exact = [c for c in pool if norm(c['과목명']) == n]
+            if exact:
+                exact.sort(key=lambda c: c['매핑상태'] != '매핑')
+                out.append({'read': name, 'exact': True, 'matches': [row(c) for c in exact[:3]]})
+                continue
+            scored = []
+            for c in pool:
+                cn = norm(c['과목명'])
+                r = SequenceMatcher(None, n, cn).ratio()
+                if n in cn:                          # 읽은 이름 + 접미(캡스톤디자인 등)
+                    r = max(r, 0.9)
+                elif cn in n:
+                    r = max(r, 0.8)
+                if r >= 0.72:
+                    scored.append((r, c))
+            scored.sort(key=lambda x: (-x[0], x[1]['매핑상태'] != '매핑'))
+            out.append({'read': name, 'exact': False, 'matches': [row(c) for _, c in scored[:3]]})
+        return out
+
     def cert_options(self):
         s = set()
         for k in self.kw.values():

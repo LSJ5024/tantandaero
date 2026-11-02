@@ -48,6 +48,14 @@ def test_why_one_line():
     assert '「품질경영」' in w and "'품질관리'와" in w and w.endswith('.')
 
 
+def test_timetable_name_resolve():
+    r = {x['read']: x for x in M.resolve_names(['데이터비즈니스', '고급비즈니스프로그래밍', '데이타마이닝', 'N14-307'])}
+    assert r['데이터비즈니스']['exact'] and r['데이터비즈니스']['matches'][0]['과목명'] == '데이터 비즈니스'
+    assert not r['고급비즈니스프로그래밍']['exact']
+    assert r['고급비즈니스프로그래밍']['matches'][0]['과목명'].startswith('고급 비즈니스 프로그래밍')
+    assert r['데이타마이닝']['matches'][0]['과목명'] == '데이터마이닝'
+
+
 def test_course_search_hides_blocked():
     names = [c['과목명'] for c in M.search_courses('미래설계')]
     assert '미래설계준비' not in names
