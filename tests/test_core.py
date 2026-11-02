@@ -41,6 +41,13 @@ def test_new_track_match():
     assert top['score'] >= 50 and '영상' in ' '.join(m['kw'] for m in top['match'])
 
 
+def test_why_one_line():
+    cid = M.search_courses('품질경영')[0]['course_id']
+    r = M.match({'courses': [cid], 'interests': [], 'tracks': ['T2'], 'certs': [], 'edu': 5, 'regions': []})
+    w = r['results'][0]['why']
+    assert '「품질경영」' in w and "'품질관리'와" in w and w.endswith('.')
+
+
 def test_course_search_hides_blocked():
     names = [c['과목명'] for c in M.search_courses('미래설계')]
     assert '미래설계준비' not in names

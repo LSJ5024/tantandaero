@@ -12,6 +12,8 @@ import re
 import sqlite3
 from datetime import date
 
+from draft import j as _j
+
 EDU_LEVELS = [('박사', 7), ('석사', 6), ('대졸(4년)', 5), ('대학졸업(4년)', 5), ('대졸(2~3년)', 4), ('대졸(2∼3년)', 4),
               ('고졸', 3), ('중졸', 1), ('무관', 0)]
 EDU_NAME = {0: '학력무관', 3: '고졸', 4: '전문대졸', 5: '대졸(4년)', 6: '석사', 7: '박사'}
@@ -144,7 +146,9 @@ class Matcher:
         dday = None
         if p.get('마감일'):
             dday = (date.fromisoformat(p['마감일']) - date.fromisoformat(profile.get('today', date.today().isoformat()))).days
+        why = self.explain(main, kws, S, src, profile, cert_hit, region and bool(regions), p, dday)
         return {
+            'why': why,
             'posting_id': p['posting_id'], 'company': p['company'], 'title': p['title'], 'url': p['url'],
             'score': score, 'parts': {'직무': round(fit), '직렬': track, '자격': cert, '학력': edu, '지역': region},
             'eligible': not reasons_no, 'reasons_no': reasons_no,
@@ -154,6 +158,47 @@ class Matcher:
             '마감일': p.get('마감일'), 'dday': dday, '기업형태': p.get('기업형태'), '기업규모': p.get('기업규모'),
             '직무키워드': p.get('직무키워드_매핑'),
         }
+
+    def explain(self, main, kws, S, src, profile, cert_hit, region_hit, p, dday):
+        """추천 이유 한 줄 (규칙 기반 · LLM 호출 없음 → 즉시·무료·재현 가능)"""
+        def q(k):                                   # '품질관리'와 / '회계'와
+            n = self.kw[k]['키워드']
+            return f"'{n}'" + _j(n, '과와')[len(n):]
+        def courses(k):
+            return '·'.join(f'「{c}」' for c in sorted(set(src.get(k, [])))[:2])
+        subs = [k for k, g in kws if g != '주' and S.get(k)]
+        if S.get(main) and src.get(main):
+            core = f"{courses(main)}에서 배운 내용이 이 공고의 핵심 직무 {q(main)} 맞아요"
+            more = [k for k in subs if src.get(k) and set(src[k]) - set(src[main])]
+            if more:                                # 다른 과목이 보조 업무까지 받쳐 주면 덧붙임
+                k = more[0]; c = sorted(set(src[k]) - set(src[main]))[0]
+                core += f". 「{c}」{_j(c, '은는')[len(c):]} '{self.kw[k]['키워드']}' 업무에도 도움돼요"
+        elif S.get(main):
+            core = f"관심 직무로 고른 {q(main)} 같은 직무를 뽑는 공고예요"
+        elif subs and src.get(subs[0]):
+            core = (f"{courses(subs[0])} 수강 이력이 이 공고의 {q(subs[0])} 연결돼요"
+                    f" (핵심 직무 '{self.kw[main]['키워드']}'는 보완 필요)")
+        elif subs:
+            core = f"관심 직무 {q(subs[0])} 관련된 공고예요"
+        else:
+            core = f"고른 직렬의 '{self.kw[main]['키워드']}' 공고예요 (관련 과목은 아직 없음)"
+        extra = []
+        if cert_hit:
+            extra.append(f"{', '.join(cert_hit[:2])} 보유")
+        if region_hit:
+            extra.append(f"희망 지역({p.get('시도')})")
+        elif p.get('충북여부'):
+            extra.append('충북 소재 기업')
+        lab = p.get('기업형태') or ''
+        for t in ('대기업', '공공기관', '중견', '코스피', '코스닥'):
+            if t in lab:
+                extra.append({'중견': '중견기업', '코스피': '코스피 상장사', '코스닥': '코스닥 상장사'}.get(t, t)); break
+        if (p.get('연봉_만원_추정') or 0) >= 3500:
+            extra.append(f"연봉 {int(p['연봉_만원_추정']):,}만원~")
+        if dday is not None and 0 <= dday <= 7:
+            extra.append(f'마감 D-{dday}')
+        extra = extra[:3]
+        return core + ('. ' + ' · '.join(extra) if extra else '') + '.'
 
     def match(self, profile, sort='score', cb_first=False, include_ineligible=False, limit=50):
         S, src = self.strengths(profile)

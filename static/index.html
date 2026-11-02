@@ -81,6 +81,8 @@ label.f{display:block;font-size:13px;color:var(--sub);margin:10px 0 4px}
 .score span{background:#fff;width:50px;height:50px;border-radius:50%;display:grid;place-items:center}
 .post .co{color:var(--sub);font-size:13px}
 .post .ti{font-weight:700;margin:1px 0 6px}
+.post .reason{background:var(--brand-soft);border-left:3px solid var(--brand);border-radius:6px;padding:7px 10px;font-size:13.5px;margin:0 0 8px;line-height:1.5}
+.post .reason b{color:var(--brand);margin-right:4px}
 .tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
 .tag{font-size:12px;padding:2px 8px;border-radius:6px;background:var(--chip);color:var(--sub)}
 .tag.cb{background:var(--ok-soft);color:var(--ok);font-weight:500}
@@ -300,7 +302,8 @@ function card(r){
     ...(r.reasons_no||[]).map(x=>`<span class="tag no">지원 불가: ${esc(x)}</span>`)].join('');
   const good = r.match.map(m=>`${esc(m.kw.replace(/^J\d+ /,''))}${m.과목.length?' ← '+m.과목.map(esc).join(', '):''}${m.관심&&!m.과목.length?' ← 관심 직무':''}`).join(' · ');
   return `<div class="post"><div class="score" style="--p:${r.score}"><span>${r.score}</span></div><div>
-    <div class="co">${esc(r.company)}</div><div class="ti">${esc(r.title)}</div><div class="tags">${tags}</div>
+    <div class="co">${esc(r.company)}</div><div class="ti">${esc(r.title)}</div>
+    ${r.why?`<div class="reason"><b>추천 이유</b> ${esc(r.why)}</div>`:''}<div class="tags">${tags}</div>
     ${good?`<div class="why good"><b>맞는 점</b> ${good}</div>`:''}
     ${r.gap.length?`<div class="why gap"><b>부족한 점</b> ${r.gap.map(g=>esc(g.replace(/^J\d+ /,''))).join(', ')}</div>`:''}
     ${r.cert_hit.length?`<div class="why good"><b>자격</b> ${r.cert_hit.map(esc).join(', ')} 보유</div>`:''}
