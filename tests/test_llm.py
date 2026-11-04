@@ -25,7 +25,7 @@ GOOD = {
 def run(monkeypatch, *replies):
     monkeypatch.setenv('LLM_API_KEY', 'test')
     seq = iter(replies)
-    monkeypatch.setattr(llm, 'call', lambda m, c, timeout=40: json.dumps(next(seq), ensure_ascii=False))
+    monkeypatch.setattr(llm, 'call', lambda m, c, timeout=40, **kw: json.dumps(next(seq), ensure_ascii=False))
     return llm.polish(DRAFT, FACTS)
 
 
@@ -97,3 +97,31 @@ def test_api_error_falls_back(monkeypatch):
     monkeypatch.setattr(llm, 'call', boom)
     out, info = llm.polish(DRAFT, FACTS)
     assert out == DRAFT and '429' in info['reason']
+
+
+def _T():
+    return llm.fact_table({'회사': 'A사', '공고': '개발자', '직무': '백엔드 개발',
+                           '과목': [{'과목명': '데이터 분석 프로그래밍', 'topics': ['데이터 전처리'], 'role': '시각화 담당'}],
+                           '업무': ['측정 데이터 분석 기능 개발'], '회사소개': 'A사는 센서 전문 기업입니다.'})
+
+
+def test_posting_facts_in_table():
+    T = _T()
+    assert T['J1'][1] == '측정 데이터 분석 기능 개발' and 'B2' in T
+
+
+def test_no_invented_actions_or_bare_course_names():
+    T, draft = _T(), {'직무 역량': 'x'}
+    bad1 = {'직무 역량': [{'s': '「데이터 분석 프로그래밍」에서 데이터 전처리를 구현했습니다.', 'src': ['C1S']}]}
+    assert '직접 한 일' in llm.validate(draft, bad1, T, {}, {})
+    bad2 = {'직무 역량': [{'s': '데이터 분석 프로그래밍에서 데이터 전처리를 학습했습니다.', 'src': ['C1S']}]}
+    assert '꺾쇠' in llm.validate(draft, bad2, T, {}, {})
+    ok = {'직무 역량': [{'s': '「데이터 분석 프로그래밍」에서 다룬 데이터 전처리는 공고의 측정 데이터 분석 기능 개발 업무와 맞닿아 있습니다.',
+                       'src': ['C1S', 'J1']},
+                      {'s': '이 과목의 성과물에서 시각화 담당을 맡았습니다.', 'src': ['C1R']}]}
+    assert llm.validate(draft, ok, T, {}, {}) is None
+
+
+def test_strip_ids_from_text():
+    out = llm.strip_ids({'a': [{'s': '공고의 J1 업무와 (C1S) 맞닿아 B2B', 'src': ['J1']}]}, {'J1': 1, 'C1S': 1, 'B2': 1})
+    assert out['a'][0]['s'] == '공고의 업무와 맞닿아 B2B'

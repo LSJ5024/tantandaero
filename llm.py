@@ -13,7 +13,7 @@
   그래도 실패하면 템플릿 초안을 쓰고 이유를 화면에 표시한다.
 
 검사 항목 (validate)
-  - 항목 이름·순서 유지, 항목당 문장 1~7개, 항목당 700자 이하
+  - 항목 이름·순서 유지, 항목당 문장 1~10개, 항목당 950자 이하
   - 근거 ID가 실제로 존재해야 함. 근거 없는 '연결' 문장은 항목당 1개, 45자 이하
   - [직접 입력: ...] 문장은 원래 항목에 원문 그대로, 독립된 한 문장으로 모두 남아 있어야 함
   - 문장 속 숫자·영문 단어는 그 문장이 인용한 사실 안에 있어야 함
@@ -39,9 +39,12 @@ SYSTEM = """너는 한국 대학생 자기소개서 초안을 쓰는 편집자�
 1. 모든 문장에는 src로 근거 ID를 단다. 근거는 [사실표]의 ID 또는 [빈칸표]의 ID만 쓸 수 있다.
 2. 사실표에 없는 경험·수치·도구·성과·자격·수상·감정 경험을 쓰지 않는다. 사실을 부풀리거나 일반화하지 않는다.
    예) 사실이 "관리도 분석 담당"이면 "품질 개선을 이끌었습니다"라고 쓰지 않는다.
-3. 회사에 대해서는 회사명과 공고명 외의 정보(업계 위상, 비전, 제품, 규모)를 쓰지 않는다.
+3. 회사에 대해서는 회사명·공고명과 B1·B2(공고에 적힌 업종·회사 소개)에 있는 내용만 쓴다. 그 밖의 업계 위상·비전·제품·규모는 쓰지 않는다.
+3-1. J로 시작하는 ID는 공고에 적힌 실제 담당 업무다. 과목 주제(S)·성과물(T/R/U)과 J를 함께 인용해 "이 수업 내용이 이 업무에 어떻게 이어지는지"를 구체적으로 연결한다.
+     예) src ["C2S","J3"]: 「데이터 분석 프로그래밍」에서 다룬 데이터 전처리와 시각화는 공고의 '실시간 센서 데이터 수집·처리 및 시각화 기능 개발' 업무와 직접 맞닿아 있습니다.
 4. 근거 없이 문장을 잇는 연결 문장은 항목당 최대 2개, 50자 이하로만 쓰고 src를 ["연결"]로 단다. 연결 문장에도 새로운 사실을 넣지 않는다.
-4-1. '수업에서 다룬 주제'는 "학습했습니다/다뤘습니다/익혔습니다" 수준으로만 쓴다. 숙달·능숙·실무 경험이 있다고 쓰지 않는다.
+4-1. '수업에서 다룬 주제'(S·O)는 "학습했습니다/다뤘습니다/익혔습니다" 수준으로만 쓴다. 숙달·능숙·실무 경험이 있다고 쓰지 않는다.
+     "수행했다·담당했다·구현했다·개발했다·설계했다"처럼 직접 한 일은 성과물 입력(T·R·U·V)을 인용할 때만 쓴다. 역할 입력이 없는 성과물에 역할을 지어내지 않는다.
 4-2. 주제와 지원 직무의 연관성은 설명해도 된다(예: "관리도는 품질관리 업무의 기초입니다"). 단 회사의 실제 업무 내용을 단정하지 않는다.
 
 [빈칸 규칙]
@@ -50,8 +53,15 @@ SYSTEM = """너는 한국 대학생 자기소개서 초안을 쓰는 편집자�
 
 [표현 규칙]
 7. 과장·평가 표현을 쓰지 않는다: 공식적으로, 탁월한, 뛰어난, 완벽한, 최고의, 전문가, 누구보다, 성공적으로, 크게 기여, 확신합니다, 반드시, 혁신적인.
-8. 과목명은 「」 안에 사실표의 이름 그대로 쓴다.
-9. 존댓말 평서문(~습니다)으로, 한 문장은 90자 이내로 쓴다. 근거가 충분하면 항목당 3~6문장, 200~450자로 충실하게 쓴다. 근거가 적은 항목은 짧아도 된다.
+8. 과목명은 「」 안에 사실표의 이름 그대로 쓴다. 문장 안에 근거 ID(J3, C1S 같은 것)를 쓰지 않는다. ID는 src에만 쓴다.
+9. 존댓말 평서문(~습니다)으로, 한 문장은 100자 이내로 쓴다. 과목·주제를 쉼표로 나열만 하지 말고, 각 사실이 지원 직무에 왜 의미 있는지 이어서 설명한다.
+   근거가 충분하면 항목당 4~8문장, 350~650자로 풍성하게 쓴다. 근거가 적은 항목은 짧아도 된다.
+
+[항목별 구성] (해당 근거가 있을 때만, 없는 단계는 건너뛴다)
+- 지원 동기: 회사가 하는 일(B2·B1) → 공고 업무 중 내 수업과 맞닿는 업무(J) 1~2개 → 그 업무와 연결되는 과목(C·S) → 그래서 이 회사의 이 직무에 지원하는 이유.
+- 직무 역량: 과목마다 "다룬 주제(S) → 그 주제가 쓰이는 공고 업무(J) 또는 직무"를 짝지어 설명한다. 자격증(Q1)은 관련 업무와 함께 쓴다.
+- 프로젝트 경험: 어느 수업(C)에서 → 무엇을 했고(T) → 내가 맡은 일(R) → 사용한 도구·기법(U) → 결과(V, 있으면) → 이 경험이 공고 업무(J)에 어떻게 이어지는지. 성과물이 2개 이상이면 각각 이 순서로.
+- 입사 후 포부: 공고 업무(J)를 기준으로 "입사 초기에 익힐 업무 → 이후 수업 주제(S)·도구(U)를 활용해 기여할 업무" 순서의 단계 계획. 막연한 다짐 문장은 1개 이하로.
 10-1. '프로젝트 경험' 항목이 있으면 성과물 제목·역할·결과(C?T, C?R, C?V)는 그 항목에만 쓰고 다른 항목에서 반복하지 않는다.
 10. 항목 이름과 순서는 [초안]과 같게 유지한다. 빈칸만 있는 항목은 그 빈칸 문장 하나만 쓴다.
 
@@ -102,6 +112,12 @@ def fact_table(facts):
                 T[f'C{i}{suf}'] = (f"{c.get('과목명')} – {label}", c[k])
     if facts.get('자격증'):
         T['Q1'] = ('보유 자격증', ', '.join(facts['자격증']))
+    if facts.get('업종'):
+        T['B1'] = ('회사 업종(공고 기재)', facts['업종'])
+    if facts.get('회사소개'):
+        T['B2'] = ('회사 소개(공고 기재)', facts['회사소개'])
+    for i, t in enumerate(facts.get('업무') or [], 1):
+        T[f'J{i}'] = ('공고의 담당 업무', t)
     for k, (fid, label) in {'motive': ('M1', '지원 동기(본인 작성)'), 'experience': ('E1', '수업 밖 경험(본인 작성)'),
                             'goal': ('G1', '입사 후 목표(본인 작성)')}.items():
         if (facts.get('추가') or {}).get(k):
@@ -130,10 +146,10 @@ def validate(draft, out, T, P, where):
             return f"'{sec}' 항목이 비어 있습니다"
         only_ph = not PH_RE.sub('', draft[sec]).strip()
         n_real = sum(1 for it in items if isinstance(it, dict) and not PH_RE.fullmatch(str(it.get('s', '')).strip()))
-        if not only_ph and not (1 <= n_real <= 8):
-            return f"'{sec}' 항목의 문장 수가 {n_real}개입니다(1~8개)"
-        if sum(len(str(it.get('s', ''))) for it in items if isinstance(it, dict)) > 800:
-            return f"'{sec}' 항목이 800자를 넘습니다"
+        if not only_ph and not (1 <= n_real <= 10):
+            return f"'{sec}' 항목의 문장 수가 {n_real}개입니다(1~10개)"
+        if sum(len(str(it.get('s', ''))) for it in items if isinstance(it, dict)) > 950:
+            return f"'{sec}' 항목이 950자를 넘습니다"
         n_link = 0
         for it in items:
             if not isinstance(it, dict) or not isinstance(it.get('s'), str) or not isinstance(it.get('src'), list):
@@ -168,6 +184,12 @@ def validate(draft, out, T, P, where):
             extra = _tokens(s) - _tokens(cited) - _tokens(' '.join(c for c in course_names if c))
             if extra:
                 return f"근거에 없는 숫자·영문({', '.join(sorted(extra)[:4])}): {s[:30]}"
+            if (re.search(r'(수행|담당|구현|개발|구축|설계|분석|제작|진행|맡|강화|향상)(했|하였|았|었|시켰)|길렀|키웠', s)
+                    and not any(re.fullmatch(r'C\d+[TRUV]|E1', x) for x in src)):
+                return f"직접 한 일(수행·담당·구현 등)은 성과물 입력(제목·역할·도구·결과)을 근거로만 쓸 수 있습니다: {s[:30]}"
+            for c in course_names:
+                if c and c in s.replace(f'「{c}」', ''):
+                    return f"과목명은 「{c}」처럼 꺾쇠로 감싸 써야 합니다: {s[:30]}"
             for c in re.findall(r'「([^」]+)」', s):
                 if c not in course_names:
                     return f"입력하지 않은 과목명: {c}"
@@ -178,6 +200,19 @@ def validate(draft, out, T, P, where):
     if missing:
         return f"빈칸이 빠지거나 중복됐습니다: {missing[0]}"
     return None
+
+
+def strip_ids(out, T):
+    """모델이 문장 본문에 근거 ID(J3, C1S 등)를 섞어 쓴 경우 지움 (src는 그대로)"""
+    if not isinstance(out, dict) or not T:
+        return out
+    pat = re.compile(r'\s*[\(\[]?\b(?:' + '|'.join(map(re.escape, sorted(T, key=len, reverse=True))) + r')\b[\)\]]?')
+    for items in out.values():
+        if isinstance(items, list):
+            for it in items:
+                if isinstance(it, dict) and isinstance(it.get('s'), str):
+                    it['s'] = re.sub(r'\s{2,}', ' ', pat.sub('', it['s'])).strip()
+    return out
 
 
 def render(out):
@@ -196,19 +231,19 @@ def call(messages, cfg, timeout=40, max_tokens=None, json_mode=True):
                                  headers={'Authorization': f"Bearer {cfg['key']}", 'Content-Type': 'application/json',
                                           'User-Agent': 'tantandaero/1.0'})   # 기본 Python UA는 Cloudflare 1010으로 차단됨
     last = None
-    for attempt in range(2):                      # 429·5xx 한 번 재시도
+    for attempt in range(3):                      # 429·5xx 두 번까지 재시도
         try:
             res = json.loads(urllib.request.urlopen(req, timeout=timeout).read())
             return res['choices'][0]['message']['content']
         except urllib.error.HTTPError as e:
             last = f'HTTP {e.code}: {e.read()[:200].decode("utf-8", "ignore")}'
-            if e.code in (429, 500, 502, 503) and attempt == 0:
+            if e.code in (429, 500, 502, 503) and attempt < 2:
                 wait = e.headers.get('retry-after') if e.headers else None
                 try:
                     wait = float(wait)
                 except (TypeError, ValueError):
                     wait = 3
-                if wait <= 20:                    # 너무 오래 기다려야 하면 바로 템플릿으로
+                if wait <= 30:                    # 분당 한도는 보통 수십 초 안에 풀림. 더 길면 바로 템플릿으로
                     time.sleep(wait)
                     continue
             break
@@ -244,11 +279,12 @@ def polish(draft, facts, max_tries=2):
     for attempt in range(max_tries):
         info['tries'] = attempt + 1
         try:
-            raw = call(msgs, cfg)
+            raw = call(msgs, cfg, timeout=60, max_tokens=3000)   # 요청 토큰 상한을 둬 분당 한도 안에 들도록
             out = parse_json(raw)
         except Exception as e:
             reason = f'LLM 호출 실패 ({e})'
             break
+        out = strip_ids(out, T)
         reason = validate(draft, out, T, P, where)
         if not reason:
             labels = {**{k: v[0] for k, v in T.items()}, **{k: '빈칸' for k in P}, '연결': '연결 문장'}

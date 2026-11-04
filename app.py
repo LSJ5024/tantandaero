@@ -8,7 +8,7 @@ from pathlib import Path
 from flask import Flask, jsonify, request, send_file, send_from_directory
 
 import llm  # noqa: E402  (load_env 이후에 읽어야 환경변수 반영)
-from draft import build_template, clean_title, to_docx
+from draft import build_template, clean_title, company_info, job_tasks, to_docx
 from matcher import EDU_NAME, Matcher
 from syllabus import Syllabus
 
@@ -125,12 +125,16 @@ def draft():
         if c in syl:
             r['개요'] = syl[c]['개요']
         reasons[c] = r
+    raw = M.posts[pid]
+    post['업무'] = job_tasks(raw.get('직무내용'))                # 공고에 적힌 담당 업무 (근거로 사용)
+    post['업종'], post['회사소개'] = company_info(raw.get('업종'))
     template = build_template(post, prof, picked, names, reasons, extra)
     facts = {
         '회사': post['company'], '공고': clean_title(post['title']),
         '직무': ((post.get('직무키워드') or '').split(',')[0].split(' ', 1)[-1].replace('(부)', '').strip()),
         '과목': [{'과목명': names[c], **{k: v for k, v in reasons.get(c, {}).items() if v}} for c in picked],
         '자격증': prof['certs'], '추가': {k: v for k, v in extra.items() if v},
+        '업무': post['업무'], '업종': post['업종'], '회사소개': post['회사소개'],
     }
     sections, info = (llm.polish(template, facts) if b.get('use_llm', True)
                       else (template, {'used': False, 'reason': '템플릿 선택'}))
